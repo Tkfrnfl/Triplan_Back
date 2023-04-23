@@ -1,0 +1,16 @@
+schema {
+    query: Query,
+    mutation: Mutation,
+}
+
+type Mutation{
+    createMember(name:String!):Member!
+}
+
+type Query{
+    findName(name:String!):String
+}
+type Member{
+    id:Int,
+    name:String
+}
