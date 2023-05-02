@@ -8,10 +8,10 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Service
 
 @Service
-class CustomUserDetailsService(@Autowired private val userRepository: UserRepository): UserDetailsService {
+class CustomUserDetailsService(private val userRepository: UserRepository): UserDetailsService {
 
     override fun loadUserByUsername(username: String): UserDetails {
-        var findUser: User = userRepository.findById(username.toLong()).orElseThrow()
+        val findUser: User = userRepository.findById(username.toLong()).orElseThrow()
         return UserPrincipal.create(findUser)
     }
 }
