@@ -6,12 +6,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import java.util.Collections
 
-class UserPrincipal(var userId: Long, var authorities: MutableCollection<out GrantedAuthority>): UserDetails {
+class UserPrincipal(private var userId: Long, private var authorities: MutableCollection<out GrantedAuthority>): UserDetails {
 
     companion object {
-        val TAG = "UserPrincipal"
         fun create(user: User): UserPrincipal {
-            var authorities = Collections.singletonList(SimpleGrantedAuthority(user.role?.value))
+            val authorities = Collections.singletonList(SimpleGrantedAuthority(user.role?.value))
             return UserPrincipal(user.id, authorities)
         }
     }
