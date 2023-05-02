@@ -35,12 +35,22 @@ repositories {
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.springframework.boot:spring-boot-starter-web")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 
 	//postgres
 	implementation("org.postgresql:postgresql:42.5.0")
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.0.6")
+
+	//security
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+
+	//jwt
+	implementation("io.jsonwebtoken:jjwt-api:0.11.2")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.2")
 
 	//graphql
 	implementation("org.springframework.boot:spring-boot-starter-graphql")
@@ -55,6 +65,7 @@ dependencies {
 	testImplementation("io.kotest:kotest-assertions-core:5.5.5")
 	testImplementation("com.ninja-squad:springmockk:3.0.1")
 	testImplementation("org.springframework.graphql:spring-graphql-test")
+	testImplementation("org.springframework.security:spring-security-test")
 }
 
 tasks.withType<KotlinCompile> {
