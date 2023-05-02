@@ -27,7 +27,6 @@ class User(socialId: String, email: String, img: String, nickname: String, role:
     var refreshToken: String? = null;
 
     companion object {
-        val TAG = "User"
         fun createKakaoUser(kakaoId: String, email: String, img: String, nickname: String): User {
             return User(kakaoId, email, img, nickname, Role.KAKAO);
         }
