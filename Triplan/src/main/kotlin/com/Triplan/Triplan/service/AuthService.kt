@@ -1,6 +1,7 @@
 package com.Triplan.Triplan.service
 
 import com.Triplan.Triplan.domain.user.User
+import com.Triplan.Triplan.domain.user.dto.login.LoginResponseDto
 import com.Triplan.Triplan.jwt.JwtTokenProvider
 import com.Triplan.Triplan.repository.UserRepository
 import org.json.simple.JSONObject
@@ -15,7 +16,6 @@ import org.springframework.stereotype.Service
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.exchange
 import java.util.Optional
 
 @Service
@@ -23,12 +23,15 @@ import java.util.Optional
 class AuthService(
     private val userRepository: UserRepository,
     private val jwtTokenProvider: JwtTokenProvider
-    ) {
+) {
 
     @Value("\${auth.kakao.key}")
     private var authKakaoKey: String? = null
 
-    fun getKakaoAccessTokenByCode(code: String, authKakaoRedirectUrl: String): String {
+    @Value("\${auth.kakao.redirecturl}")
+    private var authKakaoRedirectUrl: String? = null
+
+    fun getKakaoAccessTokenByCode(code: String): String {
         var accessToken = ""
         try {
             val headers = HttpHeaders()
@@ -42,7 +45,7 @@ class AuthService(
 
             val rt = RestTemplate()
             rt.requestFactory = HttpComponentsClientHttpRequestFactory()
-            val kakaoTokenRequest = HttpEntity(params, headers)
+            val kakaoTokenRequest = HttpEntity<MultiValueMap<String, String>>(params, headers)
             val response = rt.exchange(
                 "https://kauth.kakao.com/oauth/token",
                 HttpMethod.POST,
@@ -51,8 +54,9 @@ class AuthService(
             )
             val parser = JSONParser()
             val elem = parser.parse(response.body) as JSONObject
+            accessToken = elem.get("access_token") as String
         } catch (e: Exception) {
-            throw Exception()
+            throw Exception("null in getKakaoAccessTokenByCode")
         }
 
         return accessToken
@@ -62,14 +66,14 @@ class AuthService(
         try {
             val headers = HttpHeaders()
             headers.add("Authorization", "Bearer $accessToken")
-            headers.add("Content-typ", "application/x-www-form-urlencoded;charset=utf-8")
+            headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
             val rt = RestTemplate()
             rt.requestFactory = HttpComponentsClientHttpRequestFactory()
 
-            val kakaoProfileRequest: HttpEntity<MultiValueMap<String, String>> = HttpEntity(headers)
+            val kakaoProfileRequest = HttpEntity<MultiValueMap<String, String>>(headers)
 
             val response = rt.exchange(
-                "https://kapi,kakao.com/v2/user/me",
+                "https://kapi.kakao.com/v2/user/me",
                 HttpMethod.POST,
                 kakaoProfileRequest,
                 String::class.java
@@ -83,13 +87,15 @@ class AuthService(
             val nickname = (elem["properties"] as JSONObject)["nickname"] as String
             val img = (elem["properties"] as JSONObject)["profile_image"] as String
 
-            return Optional.ofNullable(User.createKakaoUser(id, email, img, nickname))
+            val user = Optional.of(User.createKakaoUser(id, email, img, nickname))
+
+            return user
         } catch (exception: Exception) {
-            throw Exception()
+            throw Exception("what's null")
         }
     }
 
-    fun tokenRefresh(refreshToken: String) {
+    fun tokenRefresh(refreshToken: String): LoginResponseDto {
         val isValid = jwtTokenProvider.validateToken(refreshToken) == null
 
         if (refreshToken.isEmpty() || !isValid) {
@@ -106,7 +112,10 @@ class AuthService(
         val newRefreshToken = jwtTokenProvider.createRefreshToken(userId)
         updateRefreshToken(userId, newRefreshToken)
 
-
+        return LoginResponseDto.from(
+            jwtTokenProvider.createAccessToken(userId),
+            newRefreshToken
+        )
     }
 
     fun updateRefreshToken(userId: Long, refreshToken: String) {
