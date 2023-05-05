@@ -47,11 +47,14 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 
+	//class 추가
+	implementation("javax.xml.bind:jaxb-api:2.3.0")
+	implementation("org.apache.httpcomponents.client5:httpclient5:5.1.3")
+	implementation("org.apache.httpcomponents.client5:httpclient5-fluent:5.1.3")
+
 	//jwt
-	implementation("io.jsonwebtoken:jjwt-api:0.11.2")
 	implementation("com.googlecode.json-simple:json-simple:1.1.1")
-	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
-	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.2")
+	implementation("io.jsonwebtoken:jjwt:0.9.1")
 
 	//graphql
 	implementation("org.springframework.boot:spring-boot-starter-graphql")
