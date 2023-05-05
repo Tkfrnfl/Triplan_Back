@@ -17,12 +17,12 @@ import java.util.Date
 class JwtTokenProvider(
     @Value("\${auth.jwtSecret}") var jwtSecret: String,
     @Value("\${auth.jwtExpiration.accessToken}") var jwtAccessToken: Int,
-    @Value("\${auth.jwtExpiration.refreshToken") var jwtRefreshToken: Int) {
+    @Value("\${auth.jwtExpiration.refreshToken}") var jwtRefreshToken: Int) {
 
     private fun createToken(payload: Long, jwtSecret: String, jwtExpirationAccessToken: Int): String {
 
         return Jwts.builder().setSubject(payload.toString()).signWith(SignatureAlgorithm.HS256, jwtSecret)
-            .setExpiration(Date(System.currentTimeMillis() + jwtExpirationAccessToken)).compact();
+            .setExpiration(Date(System.currentTimeMillis() + jwtExpirationAccessToken)).compact()
     }
 
     fun createAccessToken(payload: Long): String {
@@ -35,9 +35,9 @@ class JwtTokenProvider(
 
     fun getJwtTokenPayload(token: String): Long {
         try {
-            var claims = Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token).body.toString()
+            val claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).body
 
-            return claims.toLong()
+            return claims.subject.toLong()
         } catch(exception: ExpiredJwtException) {
             throw Exception()
         } catch(exception: MalformedJwtException) {
@@ -51,7 +51,7 @@ class JwtTokenProvider(
 
     fun validateToken(token: String?): ExceptionCode? {
         try {
-            var claims = Jwts.parserBuilder().setSigningKey(jwtSecret).build().parseClaimsJws(token)
+            val claims = Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token)
             if (claims.body.expiration.before(Date())) {
                 return ExceptionCode.FAIL_AUTHENTICATION
             }
