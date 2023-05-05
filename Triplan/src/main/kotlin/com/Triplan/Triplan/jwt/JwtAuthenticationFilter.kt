@@ -7,13 +7,10 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -31,7 +28,6 @@ class JwtAuthenticationFilter(
         const val PREFIX_BEARER = "Bearer "
     }
 
-    @Throws(ServletException::class, IOException::class)
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
         val accessToken = resolveToken(request)
         val errorCode = jwtTokenProvider.validateToken(accessToken)
@@ -61,7 +57,7 @@ class JwtAuthenticationFilter(
 
     private fun resolveToken(request: HttpServletRequest): String? {
         val bearerToken = request.getHeader(AUTHORIZATION)
-        if (bearerToken.isNotEmpty() && bearerToken.startsWith(PREFIX_BEARER)) {
+        if (!bearerToken.isNullOrEmpty() && bearerToken.startsWith(PREFIX_BEARER)) {
             return bearerToken.substring(7)
         }
         return null
