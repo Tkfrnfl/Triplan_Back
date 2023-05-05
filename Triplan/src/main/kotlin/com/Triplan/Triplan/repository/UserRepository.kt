@@ -10,4 +10,7 @@ import java.util.Optional
 interface UserRepository: JpaRepository<User, Long> {
 
     fun findByRoleAndSocialId(role: Role, socialId: String): Optional<User>
+
+    @Query(value = "SELECT u.refreshToken FROM Users u WHERE u.id=:id", nativeQuery = true)
+    fun findRefreshTokenById(@Param("id") userId: Long): String
 }

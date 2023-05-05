@@ -4,30 +4,37 @@ import com.Triplan.Triplan.domain.BaseTimeEntity
 import jakarta.persistence.*
 
 @Entity
-class User(socialId: String, email: String, img: String, nickname: String, role: Role): BaseTimeEntity() {
+@Table(
+    name = "Users",
+    uniqueConstraints = [
+        UniqueConstraint(columnNames = ["socialId", "role"])
+    ]
+)
+class User(
+
+
+    var socialId: String? = null,
+
+    var email: String? = null,
+
+    var img: String? = null,
+
+    var nickname: String? = null,
+
+    @Enumerated(EnumType.STRING)
+    var role: Role? = null,
+
+    var refreshToken: String? = null,
+
+    var userState: UserState? = null
+): BaseTimeEntity() {
 
     @Id
     @GeneratedValue
-    var id: Long = 0L;
-
-    var socialId: String? = null;
-
-    var email: String? = null;
-
-    var img: String? = null;
-
-    var nickname: String? = null;
-
-    @Enumerated(EnumType.STRING)
-    var role: Role? = null;
-
-    @Enumerated(EnumType.STRING)
-    var userState: UserState? = null;
-
-    var refreshToken: String? = null;
+    @Column(name = "user_id")
+    var id: Long = 0L
 
     companion object {
-        val TAG = "User"
         fun createKakaoUser(kakaoId: String, email: String, img: String, nickname: String): User {
             return User(kakaoId, email, img, nickname, Role.KAKAO);
         }

@@ -4,46 +4,48 @@ import com.Triplan.Triplan.exception.ExceptionCode
 import com.Triplan.Triplan.exception.ExceptionResponse
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
+import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
+import java.io.IOException
 
 @Component
-class JwtAuthenticationFilter(@Autowired val userDetailsService: UserDetailsService,
-                              @Autowired val jwtTokenProvider: JwtTokenProvider,
-                              @Autowired val objectMapper: ObjectMapper): OncePerRequestFilter() {
+class JwtAuthenticationFilter(
+    private val userDetailsService: UserDetailsService,
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val objectMapper: ObjectMapper,
+) : OncePerRequestFilter() {
 
     companion object {
-        val TAG = "JwtAuthenticationFilter"
-        val PREFIX_BEARER: String = "Bearer "
+        const val AUTHORIZATION = "Authorization"
+        const val PREFIX_BEARER = "Bearer "
     }
 
-    override fun doFilterInternal(
-        request: HttpServletRequest,
-        response: HttpServletResponse,
-        filterChain: FilterChain
-    ) {
-        var accessToken = resolveToken(request)
-        var errorCode: ExceptionCode? = jwtTokenProvider.validateToken(accessToken)
+    override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
+        val accessToken = resolveToken(request)
+        val errorCode = jwtTokenProvider.validateToken(accessToken)
 
         if (accessToken != null && errorCode == null) {
             try {
-                var userDetails: UserDetails = userDetailsService.loadUserByUsername(jwtTokenProvider.getJwtTokenPayload(accessToken).toString())
-                SecurityContextHolder.getContext().setAuthentication(UsernamePasswordAuthenticationToken(userDetails.username.toLong(), "", userDetails.authorities))
-            } catch (exception: Exception) {
-                response.setStatus(HttpStatus.UNAUTHORIZED.value())
-                response.setContentType(MediaType.APPLICATION_JSON_VALUE)
+                val userDetails = userDetailsService.loadUserByUsername(jwtTokenProvider.getJwtTokenPayload(accessToken).toString())
+                SecurityContextHolder.getContext().authentication = UsernamePasswordAuthenticationToken(
+                    userDetails.username.toLong(),
+                    "",
+                    userDetails.authorities
+                )
+            } catch (e: Exception) {
+                response.status = HttpStatus.UNAUTHORIZED.value()
+                response.contentType = MediaType.APPLICATION_JSON_VALUE
                 objectMapper.writeValue(
-                    response.outputStream, ExceptionResponse.of(ExceptionCode.FAIL_AUTHENTICATION)
+                    response.outputStream,
+                    ExceptionResponse.of(ExceptionCode.FAIL_AUTHENTICATION)
                 )
                 return
             }
@@ -54,8 +56,8 @@ class JwtAuthenticationFilter(@Autowired val userDetailsService: UserDetailsServ
     }
 
     private fun resolveToken(request: HttpServletRequest): String? {
-        var bearerToken: String = request.getHeader(AUTHORIZATION);
-        if (bearerToken.isNotEmpty() && bearerToken.startsWith(PREFIX_BEARER)) {
+        val bearerToken = request.getHeader(AUTHORIZATION)
+        if (!bearerToken.isNullOrEmpty() && bearerToken.startsWith(PREFIX_BEARER)) {
             return bearerToken.substring(7)
         }
         return null
