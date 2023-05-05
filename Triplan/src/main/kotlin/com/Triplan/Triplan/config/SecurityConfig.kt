@@ -31,18 +31,12 @@ import kotlin.jvm.Throws
 @EnableWebSecurity
 class SecurityConfig @Autowired constructor(
     private val objectMapper: ObjectMapper,
-    private val jwtAuthenticationFilter: JwtAuthenticationFilter
+    private val jwtAuthenticationFilter: JwtAuthenticationFilter,
 ) {
 
     @Bean
     fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager {
         return authenticationConfiguration.authenticationManager
-    }
-
-    @Bean
-    fun configure(): WebSecurityCustomizer {
-        return WebSecurityCustomizer { web: WebSecurity -> web.ignoring().requestMatchers(
-            "/configuration/***", "/api/user/kakao-login", "/api/user/naver-kogin", "/api/auth/token-refresh")}
     }
 
     @Bean
@@ -52,8 +46,7 @@ class SecurityConfig @Autowired constructor(
             .and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .authorizeHttpRequests()
-            .requestMatchers("/").permitAll()
-            .anyRequest().authenticated()
+            .requestMatchers("/graphql").permitAll()
             .and()
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
             .exceptionHandling {exceptions ->
@@ -87,7 +80,7 @@ class SecurityConfig @Autowired constructor(
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
-        val corsConfiguration: CorsConfiguration = CorsConfiguration()
+        val corsConfiguration = CorsConfiguration()
 
         corsConfiguration.allowCredentials = true
         corsConfiguration.allowedOrigins = Arrays.asList("http://localhost:8080")
