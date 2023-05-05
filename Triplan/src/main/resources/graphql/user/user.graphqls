@@ -1,0 +1,18 @@
+type LoginResponseDto {
+    accessToken: String!
+    refreshToken: String!
+}
+
+input KakaoLoginRequestDto {
+    code: String!
+}
+
+input TokenRefreshRequestDto {
+    refreshToken: String!
+}
+
+type UserInfoDto {
+    email: String
+    nickname: String
+    signupDate: String
+}

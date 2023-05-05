@@ -4,13 +4,10 @@ schema {
 }
 
 type Mutation{
-    createMember(name:String!):Member!
+    tokenRefresh(request: TokenRefreshRequestDto): LoginResponseDto
+    signup(request: KakaoLoginRequestDto): LoginResponseDto
 }
 
 type Query{
-    findName(name:String!):String
-}
-type Member{
-    id:Int,
-    name:String
+    test: UserInfoDto
 }
