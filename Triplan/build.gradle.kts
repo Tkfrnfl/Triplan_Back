@@ -13,7 +13,7 @@ plugins {
 	// 인자 없는 기본 생성자를 자동 생성
 	// - Hibernate가 사용하는 Reflection API에서 Entity를 만들기 위해 인자 없는 기본 생성자가 필요함
 	kotlin("plugin.noarg") version "1.7.22"
-	kotlin("kapt") version "1.7.10"
+	kotlin("kapt") version "1.8.21"
 }
 
 allOpen {
@@ -62,7 +62,8 @@ dependencies {
 
 	// querydsl 추가
 	implementation("com.querydsl:querydsl-jpa:5.0.0")
-	kapt("com.querydsl:querydsl-apt:5.0.0:jpa")
+	//kapt("com.querydsl:querydsl-apt:5.0.0:jpa")
+	//kapt kotlin java.lang.reflect.invocationtargetexception 빌드 에러발생
 	kapt("org.springframework.boot:spring-boot-configuration-processor")
 
 	testImplementation("io.kotest:kotest-runner-junit5:5.5.5")

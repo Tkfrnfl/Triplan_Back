@@ -5,6 +5,7 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+
 ### STS ###
 .apt_generated
 .classpath
@@ -37,3 +38,4 @@ out/
 .vscode/
 
 env.properties
+src/main/resources/env.properties
