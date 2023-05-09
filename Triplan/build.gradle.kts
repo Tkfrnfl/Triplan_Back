@@ -58,6 +58,7 @@ dependencies {
 
 	//graphql
 	implementation("org.springframework.boot:spring-boot-starter-graphql")
+	implementation("com.graphql-java:graphql-java-extended-scalars:19.0")
 	testImplementation("io.mockk:mockk:1.13.4")
 
 	// querydsl 추가

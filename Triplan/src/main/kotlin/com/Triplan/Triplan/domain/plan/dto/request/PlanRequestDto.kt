@@ -7,4 +7,6 @@ class PlanRequestDto {
     var startDate: LocalDate? = null
 
     var endDate: LocalDate? = null
+
+    var touristArea: String? = null
 }

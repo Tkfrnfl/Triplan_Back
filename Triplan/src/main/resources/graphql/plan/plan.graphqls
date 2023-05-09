@@ -1,0 +1,11 @@
+input PlanRequestDto {
+    startDate: Date
+    endDate: Date
+    touristArea: String
+}
+
+input DayPlanRequestDto {
+    startingPoint: String
+    tripPlaces: [String]
+    destination: String
+}

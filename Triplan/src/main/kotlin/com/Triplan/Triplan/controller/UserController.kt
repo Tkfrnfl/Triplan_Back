@@ -20,7 +20,7 @@ class UserController(private val userService: UserService) {
     }
 
     @QueryMapping
-    fun test(): UserInfoDto {
+    fun userInfo(): UserInfoDto {
         val userId = SecurityContextHolder.getContext().authentication.principal.toString().toLong()
 
         return UserInfoDto(userService.findById(userId))
