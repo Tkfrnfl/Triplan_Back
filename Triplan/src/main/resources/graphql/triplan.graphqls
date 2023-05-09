@@ -1,3 +1,5 @@
+scalar Date
+
 schema {
     query: Query,
     mutation: Mutation,
@@ -6,12 +8,16 @@ schema {
 type Mutation{
     tokenRefresh(request: TokenRefreshRequestDto): LoginResponseDto
     signup(request: KakaoLoginRequestDto): LoginResponseDto
+
     askGpt(question:String!):Question!
+
+    requestPlanInformation(request: PlanRequestDto): String
 }
 
 type Query{
-    test: UserInfoDto
+    userInfo: UserInfoDto
 }
+
 type Question{
     question:String
 }
