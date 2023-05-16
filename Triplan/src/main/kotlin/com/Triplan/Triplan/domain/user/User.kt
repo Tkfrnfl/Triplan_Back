@@ -24,8 +24,6 @@ class User(
     @Enumerated(EnumType.STRING)
     var role: Role? = null,
 
-    var refreshToken: String? = null,
-
     var userState: UserState? = null
 ): BaseTimeEntity() {
 
@@ -37,10 +35,6 @@ class User(
     companion object {
         fun createKakaoUser(kakaoId: String, email: String, img: String, nickname: String): User {
             return User(kakaoId, email, img, nickname, Role.KAKAO);
-        }
-
-        fun createNaverUser(naverId: String, email: String, img: String, nickname: String): User {
-            return User(naverId, email, img, nickname, Role.NAVER);
         }
     }
 }
