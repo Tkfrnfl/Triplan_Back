@@ -1,6 +1,5 @@
 package com.Triplan.Triplan.service
 
-import com.nimbusds.jose.shaded.gson.JsonArray
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.springframework.beans.factory.annotation.Value
@@ -13,7 +12,6 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.exchange
 
 @Transactional
 @Service
