@@ -30,8 +30,8 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	mavenCentral()
+	maven { url = uri("https://jitpack.io") }
 }
-
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -63,11 +63,16 @@ dependencies {
 	//kapt kotlin java.lang.reflect.invocationtargetexception 빌드 에러발생
 	kapt("org.springframework.boot:spring-boot-configuration-processor")
 
+	//형태소분석기
+	implementation("com.github.shin285:KOMORAN:3.3.4")
+
 	testImplementation("io.kotest:kotest-runner-junit5:5.5.5")
 	testImplementation("io.kotest:kotest-assertions-core:5.5.5")
 	testImplementation("com.ninja-squad:springmockk:3.0.1")
 	testImplementation("org.springframework.graphql:spring-graphql-test")
 	testImplementation("org.springframework.security:spring-security-test")
+
+
 }
 
 tasks.withType<KotlinCompile> {
