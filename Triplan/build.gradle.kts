@@ -43,10 +43,6 @@ dependencies {
 	// https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-log4j2
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa:3.0.6")
 
-	//security
-	implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
-	implementation("org.springframework.boot:spring-boot-starter-security")
-
 	//class 추가
 	implementation("javax.xml.bind:jaxb-api:2.3.0")
 	implementation("org.apache.httpcomponents.client5:httpclient5:5.1.3")

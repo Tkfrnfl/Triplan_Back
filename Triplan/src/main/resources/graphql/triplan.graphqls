@@ -6,8 +6,7 @@ schema {
 }
 
 type Mutation{
-    tokenRefresh(request: TokenRefreshRequestDto): LoginResponseDto
-    signup(request: KakaoLoginRequestDto): LoginResponseDto
+    login:String
 
     askGpt(question:String!):Question!
 
@@ -15,7 +14,7 @@ type Mutation{
 }
 
 type Query{
-    userInfo: UserInfoDto
+    userInfo:UserInfoDto
 }
 
 type Question{
