@@ -13,7 +13,7 @@ class AnalysisServiceTest {
         val array: Array<String> = str.toCharArray().map { it.toString() }.toTypedArray()
 //
 //        com.Triplan.Triplan.main(array)
-        val tmp= analysisService.main(array)
+        val tmp= analysisService.analysisSentence(array)
 
         println(tmp)
     }
