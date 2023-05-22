@@ -16,6 +16,14 @@ class PlanController {
         @RequestBody @Argument requests: List<DayPlanRequestDto>
     ): String {
 
+        println("startDate : " + request.startDate)
+        for (dayPlanRequestDto in requests) {
+            for (tripPlace in dayPlanRequestDto.tripPlaces) {
+                println(tripPlace)
+            }
+        }
+
+
         return "success"
     }
 }
