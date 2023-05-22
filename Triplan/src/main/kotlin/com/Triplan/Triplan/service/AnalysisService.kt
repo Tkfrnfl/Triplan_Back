@@ -26,11 +26,7 @@ class AnalysisService {
             analyzeResultList=komoran.analyze(input)
             analyzedList.add(analyzeResultList.nouns.toString())
             tokenList=analyzeResultList.tokenList
-//            for (token in tokenList) {
-//                System.out.println(token)
-//                println((((token.getMorph() + "/" + token.getPos()).toString() + "(" + token.getBeginIndex()).toString() + "," + token.getEndIndex()).toString() + ")")
-//                println()
-//            }
+//
         }
 
 //        // 1. print each tokens by getTokenList()
