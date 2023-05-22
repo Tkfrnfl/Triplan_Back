@@ -10,7 +10,7 @@ type Mutation{
 
     askGpt(question:String!):Question!
 
-    requestPlanInformation(request: PlanRequestDto): String
+    requestPlanInformation(request: PlanRequestDto, requests: [DayPlanRequestDto]): String
 }
 
 type Query{
