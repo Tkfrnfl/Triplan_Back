@@ -11,10 +11,14 @@ type Mutation{
     askGpt(question:String!):Question!
 
     requestPlanInformation(request: PlanRequestDto, requests: [DayPlanRequestDto]): String
+
+    evaluatePlan(request:PlanEvaluateDto):String
+
 }
 
 type Query{
     userInfo:UserInfoDto
+    requestEvaluateInfo(request:EvaluateRequestDto):EvaluateResponseDto
 }
 
 type Question{

@@ -1,0 +1,17 @@
+input EvaluateRequestDto{
+    userId:Int
+    planId:Int
+}
+type EvaluateResponseDto{
+    userId:Int
+    planId:Int
+    evaluateId:Int
+    rating:Int
+    detail:String
+}
+input PlanEvaluateDto{
+    userId:Int
+    planId:Int
+    rating:Int
+    detail:String
+}
