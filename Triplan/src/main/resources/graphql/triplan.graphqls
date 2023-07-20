@@ -12,7 +12,7 @@ type Mutation{
 
     requestPlanInformation(request: PlanRequestDto, requests: [DayPlanRequestDto]): String
 
-    evaluatePlan(request:PlanEvaluateDto):String
+    evaluatePlan(request:PlanEvaluateDto):EvaluateResponseDto
 
 }
 
