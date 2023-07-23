@@ -16,13 +16,20 @@ class EvaluateService( private var evaluateRepository: EvaluateRepository) {
         return  evaluateRepository.findEvaluateByUserIdAndPlanId(evaluate.userId,evaluate.planId).get()
     }
 
-    fun requestEvaluateInfo(evaluateRequestDto: EvaluateRequestDto): EvaluateResponseDto {
+    fun requestEvaluateInfo(evaluateRequestDto: EvaluateRequestDto):Array<EvaluateResponseDto> {
 
-        val evalCheck: Evaluate = evaluateRepository.findEvaluateByUserIdAndPlanId(evaluateRequestDto.userId, evaluateRequestDto.planId).get()
+        //val evalCheck: Evaluate = evaluateRepository.findEvaluateByUserIdAndPlanId(evaluateRequestDto.userId, evaluateRequestDto.planId).get()
+        val evalCheck: Array<Evaluate> = evaluateRepository.findEvaluatesByUserId(evaluateRequestDto.userId)
+        println(evalCheck.size)
+        val evaluateResponseDtoArray:MutableList<EvaluateResponseDto> = mutableListOf()
 
-        return EvaluateResponseDto(evalCheck)
+        for(i in 0 until evalCheck.size){
+            evaluateResponseDtoArray.add( EvaluateResponseDto(evalCheck[i]))
+        }
+
+        return evaluateResponseDtoArray.toTypedArray()
+
     }
-
     @Transactional
     fun evaluateMutation(evaluateMutationDto: EvaluateMutationDto):EvaluateResponseDto{
        var evaluate:Evaluate=evaluateRepository.findEvaluateByUserIdAndPlanId(evaluateMutationDto.userId,evaluateMutationDto.planId).get()

@@ -9,5 +9,5 @@ import java.util.*
 interface EvaluateRepository :JpaRepository<Evaluate,Long>{
 
     fun findEvaluateByUserIdAndPlanId(userId:Int,planId:Int): Optional<Evaluate>
-
+    fun findEvaluatesByUserId(userId: Int):Array<Evaluate>
 }

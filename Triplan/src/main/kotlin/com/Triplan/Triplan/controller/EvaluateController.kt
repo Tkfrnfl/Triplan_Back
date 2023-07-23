@@ -18,7 +18,7 @@ class EvaluateController ( private val evaluateService: EvaluateService){
 
 
     @QueryMapping
-    fun requestEvaluateInfo( @Argument request: EvaluateRequestDto):EvaluateResponseDto{
+    fun requestEvaluateInfo( @Argument request: EvaluateRequestDto):Array<EvaluateResponseDto>{
         return evaluateService.requestEvaluateInfo(request)
     }
 

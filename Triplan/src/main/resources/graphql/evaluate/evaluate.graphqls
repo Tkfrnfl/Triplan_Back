@@ -1,6 +1,6 @@
 input EvaluateRequestDto{
     userId:Int
-    planId:Int
+#    planId:Int
 }
 type EvaluateResponseDto{
     userId:Int

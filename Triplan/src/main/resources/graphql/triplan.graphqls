@@ -18,7 +18,7 @@ type Mutation{
 
 type Query{
     userInfo:UserInfoDto
-    requestEvaluateInfo(request:EvaluateRequestDto):EvaluateResponseDto
+    requestEvaluateInfo(request:EvaluateRequestDto):[EvaluateResponseDto]
 }
 
 type Question{
