@@ -79,6 +79,7 @@ dependencies {
 	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 	implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation ("com.fasterxml.jackson.core:jackson-databind")
+	implementation ("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
 }
 
 tasks.withType<KotlinCompile> {
