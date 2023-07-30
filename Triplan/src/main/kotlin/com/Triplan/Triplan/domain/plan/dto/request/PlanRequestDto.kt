@@ -1,6 +1,6 @@
 package com.Triplan.Triplan.domain.plan.dto.request
 
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 
 class PlanRequestDto {
 
