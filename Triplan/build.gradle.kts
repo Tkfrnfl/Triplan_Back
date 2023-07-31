@@ -14,6 +14,9 @@ plugins {
 	// - Hibernate가 사용하는 Reflection API에서 Entity를 만들기 위해 인자 없는 기본 생성자가 필요함
 	kotlin("plugin.noarg") version "1.7.22"
 	kotlin("kapt") version "1.8.21"
+
+	// 직렬화
+	kotlin("plugin.serialization") version "1.8.21"
 }
 
 allOpen {
@@ -72,7 +75,11 @@ dependencies {
 	testImplementation("org.springframework.graphql:spring-graphql-test")
 	testImplementation("org.springframework.security:spring-security-test")
 
-
+	// 직렬화
+	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+	implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+	implementation ("com.fasterxml.jackson.core:jackson-databind")
+	implementation ("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
 }
 
 tasks.withType<KotlinCompile> {

@@ -2,6 +2,8 @@ package com.Triplan.Triplan.domain.user
 
 import com.Triplan.Triplan.domain.BaseTimeEntity
 import jakarta.persistence.*
+import kotlinx.serialization.KSerializer
+import kotlinx.serialization.Serializable
 
 @Entity
 @Table(
@@ -10,6 +12,7 @@ import jakarta.persistence.*
         UniqueConstraint(columnNames = ["socialId", "role"])
     ]
 )
+@Serializable(with = KSerializer::class)
 class User(
 
 
@@ -32,6 +35,7 @@ class User(
     @Column(name = "user_id")
     var id: Long = 0L
 
+    @Serializable
     companion object {
         fun createKakaoUser(kakaoId: String, email: String, img: String, nickname: String): User {
             return User(kakaoId, email, img, nickname, Role.KAKAO);
