@@ -20,8 +20,8 @@ class UserController(private val userService: UserService,
     fun login(): ResponseEntity<String> {
 
         val accessToken = request.getHeader("Authorization")
-        userService.login(accessToken)
-        return ResponseEntity.ok("signup")
+        val userId= userService.login(accessToken)
+        return ResponseEntity.ok(userId)
     }
 
     @QueryMapping
