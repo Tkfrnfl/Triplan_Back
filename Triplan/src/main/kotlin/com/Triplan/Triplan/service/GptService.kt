@@ -1,6 +1,8 @@
 package com.Triplan.Triplan.service
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.google.gson.GsonBuilder
+import com.google.maps.GeoApiContext
+import com.google.maps.GeocodingApi
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
@@ -14,6 +16,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
+
 
 @Transactional
 @Service
@@ -59,7 +62,7 @@ class GptService (@Value("\${auth.gpt.key}")
                     entity,
                     String::class.java
             )
-            val parser=JSONParser()
+            val parser= JSONParser()
 
             val elem= parser.parse(response.body)as JSONObject
 
@@ -75,7 +78,7 @@ class GptService (@Value("\${auth.gpt.key}")
             }
             var parseByN= ArrayList<String>()
             var tmpParse:List<String>
-            var nounList:List<String>
+            //var nounList:List<String>
 
             for(i in 0 until parseByDay.count()){
               tmpParse= parseByDay[i].split("-")
@@ -90,6 +93,24 @@ class GptService (@Value("\${auth.gpt.key}")
                 }
             }
             println(parseByN)
+
+            for (i in 0 until parseByN.size){
+                println(parseByN.size)
+                val context = GeoApiContext.Builder()
+                        .apiKey("AIzaSyA8eyEBHHJ5QTOuXBsjHl3oyRyxnpKK5wg")
+                        .build()
+                val results = GeocodingApi.geocode(context, parseByN[i]).await()
+                val gson = GsonBuilder().setPrettyPrinting().create()
+                if(results.size>0){
+                    println(gson.toJson(results[0].geometry.location))
+                }
+
+//                for(i in 0 until results.size){
+//
+//                }
+            }
+
+
 
 
 //            for(i in 0 until parseByDay.count()){       //일차 별로 파싱

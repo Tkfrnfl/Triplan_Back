@@ -64,7 +64,7 @@ dependencies {
 	implementation("com.querydsl:querydsl-jpa:5.0.0")
 	//kapt("com.querydsl:querydsl-apt:5.0.0:jpa")
 	//kapt kotlin java.lang.reflect.invocationtargetexception 빌드 에러발생
-	kapt("org.springframework.boot:spring-boot-configuration-processor")
+	//kapt("org.springframework.boot:spring-boot-configuration-processor")
 
 	//형태소분석기
 	implementation("com.github.shin285:KOMORAN:3.3.4")
@@ -80,6 +80,11 @@ dependencies {
 	implementation ("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation ("com.fasterxml.jackson.core:jackson-databind")
 	implementation ("org.jetbrains.kotlinx:kotlinx-datetime:0.3.2")
+
+	//geocoder
+	implementation("com.google.code.geocoder-java:geocoder-java:0.16")
+	implementation("com.google.maps:google-maps-services:2.2.0")
+
 }
 
 tasks.withType<KotlinCompile> {
