@@ -1,11 +1,18 @@
 package com.Triplan.Triplan.service
 
+import com.Triplan.Triplan.domain.plan.Plan
+import com.Triplan.Triplan.domain.plan.dto.request.DayPlanRequestDto
+import com.Triplan.Triplan.domain.plan.dto.request.PlanRequestDto
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonParser
 import com.google.maps.GeoApiContext
 import com.google.maps.GeocodingApi
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.toKotlinLocalDate
 import org.json.simple.JSONArray
 import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.PropertySource
 import org.springframework.http.HttpEntity
@@ -16,6 +23,7 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.client.RestTemplate
+import kotlinx.datetime.LocalDate as LocalDate
 
 
 @Transactional
@@ -26,8 +34,11 @@ import org.springframework.web.client.RestTemplate
 class GptService (@Value("\${auth.gpt.key}")
                   val gptKey:String,private val analysisService: AnalysisService){
 
+
+
+
     //jwt 필터로 유저인증되는것인지?
-    fun getQuestion(question:String){
+    fun getQuestion(question:String, planService:PlanService){
 
         try{
             val rt = RestTemplate()
@@ -82,6 +93,12 @@ class GptService (@Value("\${auth.gpt.key}")
 
             for(i in 0 until parseByDay.count()){
               tmpParse= parseByDay[i].split("-")
+                if (tmpParse.size<2){
+                    tmpParse= parseByDay[i].split(":")
+                }
+                if (tmpParse.size<2){
+                    tmpParse= parseByDay[i].split("\\n")
+                }
                 for(j in 0 until tmpParse.count()){
                     var morning:String="오전"
                     var launch:String="점심"
@@ -94,6 +111,9 @@ class GptService (@Value("\${auth.gpt.key}")
             }
             println(parseByN)
 
+            val geoList=ArrayList<String>()
+
+            //일단 하루 플랜을 기준으로 계산
             for (i in 0 until parseByN.size){
                 println(parseByN.size)
                 val context = GeoApiContext.Builder()
@@ -102,13 +122,42 @@ class GptService (@Value("\${auth.gpt.key}")
                 val results = GeocodingApi.geocode(context, parseByN[i]).await()
                 val gson = GsonBuilder().setPrettyPrinting().create()
                 if(results.size>0){
+                    geoList.add(gson.toJson(results[0].geometry.location))
                     println(gson.toJson(results[0].geometry.location))
                 }
-
-//                for(i in 0 until results.size){
-//
-//                }
             }
+            var tmpToday=java.time.LocalDate.now()
+            var tempStartDate=java.time.LocalDate.of(tmpToday.year,tmpToday.month,tmpToday.dayOfMonth);
+            var tempEndDate=java.time.LocalDate.of(tmpToday.year,tmpToday.month,tmpToday.dayOfMonth+1);
+
+
+            var request=PlanRequestDto()
+            request.startDate=tempStartDate.toKotlinLocalDate()
+            request.endDate=tempEndDate.toKotlinLocalDate()
+            request.touristArea=""
+
+            var requests=ArrayList<DayPlanRequestDto>()
+            var tripList=ArrayList<String>()
+           // for(i in 1 until geoList.size){
+                var dayPlanRequestDto=DayPlanRequestDto()
+            val jsonParser = JsonParser()
+            var json = jsonParser.parse(geoList[0]).asJsonObject
+            println(json["lat"])
+                dayPlanRequestDto.startingPoint=json["lat"].toString()+", "+json["lng"].toString()
+
+                for (i in 1 until geoList.size){
+                    json = jsonParser.parse(geoList[i]).asJsonObject
+                    tripList.add(json["lat"].toString()+","+json["lng"].toString())
+                }
+                dayPlanRequestDto.tripPlaces=tripList
+
+                json = jsonParser.parse(geoList[geoList.size-1]).asJsonObject
+                dayPlanRequestDto.destination=json["lat"].toString()+", "+json["lng"].toString()
+
+                requests.add(dayPlanRequestDto)
+           // }
+            val plan: Plan = planService.route(request,requests)
+            println(plan.dayPlans)
 
 
 

@@ -30,7 +30,6 @@ class PlanService(
     val naverKey: String,
     private var planRepository: PlanRepository
 ) {
-
     fun findByUser(user: User): Plan {
 
         return planRepository.findByUser(user).get()
@@ -42,8 +41,8 @@ class PlanService(
             result.startDate = request.startDate
             result.endDate = request.endDate
             result.touristArea = request.touristArea
-
-
+            println(requests[0].startingPoint)
+            println(requests[0].tripPlaces)
             //일자별 계획 계산
             for ((idx, day) in requests.withIndex()) {
 //                println("${day.startingPoint}  ${day.destination}  ${day.tripPlaces}")
@@ -51,7 +50,7 @@ class PlanService(
                 val start = day.startingPoint?.split(", ")?.reversed()?.joinToString()
                 val destination = day.destination?.split(", ")?.reversed()?.joinToString()
                 val routes = mutableListOf<HashMap<String, String>>()
-
+                println(start)
                 /*// Ex){place1 : {'x': '127.0315025', 'y': '37.4909898'}}
                 val coordinates = HashMap<String, HashMap<String, String>>()
 
@@ -89,15 +88,18 @@ class PlanService(
                 val permutationResult = permutation(day.tripPlaces.slice(1 until day.tripPlaces.size - 1), listOf())
 
                 for (stopover in permutationResult) {
+
                     // 네이버 길찾기 api
                     val headers = HttpHeaders()
                     var waypoint = ""
+                    println(stopover)
                     stopover.forEach {
                         if (waypoint != ""){
                             waypoint += "|"
                         }
                         waypoint += it.split(", ").reversed().joinToString(",")
                     }
+                    println(waypoint)
                     headers.add("X-NCP-APIGW-API-KEY-ID", naverKeyID)
                     headers.add("X-NCP-APIGW-API-KEY", naverKey)
                     val requestParams = "?start=${start}&goal=${destination}&waypoints=${waypoint}"
@@ -112,6 +114,9 @@ class PlanService(
                         geoCodeRequest,
                         String::class.java
                     )
+                    println(response)
+                            println(response.statusCode)
+                    println(response.toString())
 
                     val parser = JSONParser()
                     val elem = parser.parse(response.body) as JSONObject
@@ -145,7 +150,6 @@ class PlanService(
         } catch (exception: Exception) {
             throw Exception("Plan Route Exception")
         }
-
     }
 
 
