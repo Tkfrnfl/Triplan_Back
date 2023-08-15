@@ -116,18 +116,38 @@ class PlanService(
                     )
                     println(response)
                             println(response.statusCode)
-                    println(response.toString())
+
 
                     val parser = JSONParser()
-                    val elem = parser.parse(response.body) as JSONObject
-                    val parsedResult =
-                        (((elem["route"] as JSONObject)["traoptimal"] as JSONArray)[0] as JSONObject)["summary"] as JSONObject
+                    var elem = parser.parse(response.body) as JSONObject
 
-                    routes.add(hashMapOf(
-                        "stopover" to waypoint,
-                        "duration" to parsedResult["duration"].toString(),
-                        "distance" to parsedResult["distance"].toString()
-                    ))
+                    if(elem["code"].toString()=="0"){
+                        println(elem["code"])
+                        val parsedResult =
+                                (((elem["route"] as JSONObject)["traoptimal"] as JSONArray)[0] as JSONObject)["summary"] as JSONObject
+
+                        routes.add(hashMapOf(
+                                "stopover" to waypoint,
+                                "duration" to parsedResult["duration"].toString(),
+                                "distance" to parsedResult["distance"].toString()
+                        ))
+                    }
+                    else{
+
+                        elem=adjustLocation(stopover,start,destination)
+                        if(elem["code"]==null){
+                            return result
+                        }
+                        val parsedResult =
+                                (((elem["route"] as JSONObject)["traoptimal"] as JSONArray)[0] as JSONObject)["summary"] as JSONObject
+
+                        routes.add(hashMapOf(
+                                "stopover" to waypoint,
+                                "duration" to parsedResult["duration"].toString(),
+                                "distance" to parsedResult["distance"].toString()
+                        ))
+                    }
+
                 }
 
 
@@ -148,6 +168,7 @@ class PlanService(
 
             return result
         } catch (exception: Exception) {
+            println(exception)
             throw Exception("Plan Route Exception")
         }
     }
@@ -156,5 +177,53 @@ class PlanService(
     fun <T> permutation(el: List<T>, fin: List<T> = listOf(), sub: List<T> = el): List<List<T>> {
         return if (sub.isEmpty()) listOf(fin)
         else sub.flatMap { permutation(el, fin + it, sub - it) }
+    }
+
+    // 경유지가 도로주변이 아닐때 위치보정시도, 그래도 안될시 null
+    fun adjustLocation(stopover:List<String>,start:String?,destination:String?):JSONObject{
+        val tempList:MutableList<String> = stopover.toMutableList()
+        var result=JSONObject()
+
+        for (i in 0 until stopover.size){
+
+            val headers = HttpHeaders()
+            var waypoint = ""
+           // println((tempList[i].toInt()+0.005).toString())
+            var tempSplitList=tempList[i].split(",")
+            tempList[i]=String.format("%.7f",tempSplitList[0].toFloat()+0.01)+","+String.format("%.7f",tempSplitList[1].toFloat()+0.005)
+            println(tempList)
+            tempList.forEach {
+                if (waypoint != ""){
+                    waypoint += "|"
+                }
+                waypoint += it.split(", ").reversed().joinToString(",")
+            }
+            println("check")
+            println(waypoint)
+            headers.add("X-NCP-APIGW-API-KEY-ID", naverKeyID)
+            headers.add("X-NCP-APIGW-API-KEY", naverKey)
+            val requestParams = "?start=${start}&goal=${destination}&waypoints=${waypoint}"
+            val url = "https://naveropenapi.apigw.ntruss.com/map-direction/v1/driving$requestParams"
+            val rt = RestTemplate()
+            rt.requestFactory = HttpComponentsClientHttpRequestFactory()
+            val geoCodeRequest = HttpEntity<MultiValueMap<String, String>>(headers)
+
+            val response = rt.exchange(
+                    url,
+                    HttpMethod.GET,
+                    geoCodeRequest,
+                    String::class.java
+            )
+
+
+            val parser = JSONParser()
+            var elem = parser.parse(response.body) as JSONObject
+            println(response)
+            if(elem["code"].toString()=="0"){
+                result=elem
+                break
+            }
+        }
+        return result
     }
 }
