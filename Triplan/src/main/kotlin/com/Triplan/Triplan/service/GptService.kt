@@ -156,8 +156,12 @@ class GptService (@Value("\${auth.gpt.key}")
 
                 requests.add(dayPlanRequestDto)
            // }
-            val plan: Plan = planService.route(request,requests)
-            println(plan.dayPlans)
+            kakaoRoadApi(requests)
+
+//            val plan: Plan = planService.route(request,requests)      카카오 api로 대체
+//            println(plan.dayPlans)
+
+
 
 
 
@@ -181,4 +185,54 @@ class GptService (@Value("\${auth.gpt.key}")
             println(exception.toString())
         }
     }
+
+    fun kakaoRoadApi(requests:List<DayPlanRequestDto>){ // 같은 경유지 고르는경우 예외처리 추가하기
+        val headers=HttpHeaders()
+
+        headers.add("Authorization","KakaoAK 2ad875a1d5fbba4e1912c0f930157e89")
+
+        val url= "https://apis-navi.kakaomobility.com/v1/waypoints/directions"
+        val rt = RestTemplate()
+        rt.requestFactory = HttpComponentsClientHttpRequestFactory()
+
+        val start=JSONObject()
+        start.put("x", requests[0].startingPoint?.split(",")?.get(1)?.toDouble())
+//        println(requests[0].startingPoint?.split(",")?.get(1)?.toDouble())
+//        println(requests[0].startingPoint?.split(",")?.get(0)?.toDouble())
+        start.put("y", requests[0].startingPoint?.split(",")?.get(0)?.toDouble())
+        val end=JSONObject()
+        end.put("x", requests[0].destination?.split(",")?.get(1)?.toDouble())
+        end.put("y", requests[0].destination?.split(",")?.get(0)?.toDouble())
+
+        val waypoints=JSONArray()
+        for (i in 0 until requests[0].tripPlaces.size){
+            val places=JSONObject()
+            places.put("name",i.toString())
+            places.put("x",requests[0].tripPlaces[i]?.split(",")?.get(1)?.toDouble())
+            places.put("y",requests[0].tripPlaces[i]?.split(",")?.get(0)?.toDouble())
+        }
+
+        val jsonObjectMessage=JSONObject()
+        jsonObjectMessage.put("origin", start)
+        jsonObjectMessage.put("destination", end)
+        jsonObjectMessage.put("waypoints", waypoints)
+        jsonObjectMessage.put("priority", "RECOMMEND")
+        jsonObjectMessage.put("car_fuel", "GASOLINE")
+        jsonObjectMessage.put("car_hipass", false)
+        jsonObjectMessage.put("alternatives", false)
+        jsonObjectMessage.put("road_details", false)
+
+        val entity: HttpEntity<JSONObject> = HttpEntity<JSONObject>(jsonObjectMessage, headers)
+
+        val response= rt.exchange(
+                url,HttpMethod.POST,entity,String::class.java
+        )
+
+        val parser= JSONParser()
+
+        val elem= parser.parse(response.body)as JSONObject
+        println(elem)
+    }
+
+
 }
