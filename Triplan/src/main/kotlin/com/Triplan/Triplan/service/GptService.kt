@@ -61,7 +61,7 @@ class GptService (@Value("\${auth.gpt.key}")
             val jsonObject =  JSONObject()
             jsonObject.put("model", "gpt-3.5-turbo")
             jsonObject.put("messages", messages)
-            jsonObject.put("max_tokens", 300)
+            jsonObject.put("max_tokens", 150)
             jsonObject.put("temperature", 1.0)
 
 
@@ -78,7 +78,7 @@ class GptService (@Value("\${auth.gpt.key}")
             val elem= parser.parse(response.body)as JSONObject
 
             val choices=(elem["choices"] as List<JSONObject>)
-            val message=((choices[0])["message"] as JSONObject)["content"]
+            val message=((choices[0])["message"] as JSONObject)["content"] //gpt로부터 응답받은 값
            // println(message.toString())
             var parseByDay:List<String>
             if(message.toString().contains("Day")){
@@ -112,8 +112,8 @@ class GptService (@Value("\${auth.gpt.key}")
             println(parseByN)
 
             val geoList=ArrayList<String>()
-
-            //일단 하루 플랜을 기준으로 계산
+           // val locationMap=HashMap<String,String>()
+            //일단 하루 플랜을 기준으로 계산         geo coder로 좌표변환하는 부분
             for (i in 0 until parseByN.size){
                 println(parseByN.size)
                 val context = GeoApiContext.Builder()
@@ -123,9 +123,17 @@ class GptService (@Value("\${auth.gpt.key}")
                 val gson = GsonBuilder().setPrettyPrinting().create()
                 if(results.size>0){
                     geoList.add(gson.toJson(results[0].geometry.location))
+                    //locationMap.put(parseByN[i],results[0].geometry.location.toString())
                     println(gson.toJson(results[0].geometry.location))
                 }
             }
+
+            //값 매핑 체크
+//            for ((key, value) in locationMap) {
+//                println("전체 : ${key} : ${value}")
+//            }
+
+            //planRequestDto 형식에 맞게 형변환
             var tmpToday=java.time.LocalDate.now()
             var tempStartDate=java.time.LocalDate.of(tmpToday.year,tmpToday.month,tmpToday.dayOfMonth);
             var tempEndDate=java.time.LocalDate.of(tmpToday.year,tmpToday.month,tmpToday.dayOfMonth+1);
@@ -156,7 +164,7 @@ class GptService (@Value("\${auth.gpt.key}")
 
                 requests.add(dayPlanRequestDto)
            // }
-            kakaoRoadApi(requests)
+            kakaoRoadApi(requests,parseByN)
 
 //            val plan: Plan = planService.route(request,requests)      카카오 api로 대체
 //            println(plan.dayPlans)
@@ -186,7 +194,7 @@ class GptService (@Value("\${auth.gpt.key}")
         }
     }
 
-    fun kakaoRoadApi(requests:List<DayPlanRequestDto>){ // 같은 경유지 고르는경우 예외처리 추가하기
+    fun kakaoRoadApi(requests:List<DayPlanRequestDto>,locationString:ArrayList<String>){ // 같은 경유지 고르는경우 예외처리 추가하기
         val headers=HttpHeaders()
 
         headers.add("Authorization","KakaoAK 2ad875a1d5fbba4e1912c0f930157e89")
@@ -204,14 +212,19 @@ class GptService (@Value("\${auth.gpt.key}")
         end.put("x", requests[0].destination?.split(",")?.get(1)?.toDouble())
         end.put("y", requests[0].destination?.split(",")?.get(0)?.toDouble())
 
+        if (start==end){
+            println( "도착지와 목적지가같습니다.")
+        }
         val waypoints=JSONArray()
         for (i in 0 until requests[0].tripPlaces.size){
             val places=JSONObject()
-            places.put("name",i.toString())
+            places.put("name",locationString[i+1])
             places.put("x",requests[0].tripPlaces[i]?.split(",")?.get(1)?.toDouble())
             places.put("y",requests[0].tripPlaces[i]?.split(",")?.get(0)?.toDouble())
-        }
 
+            waypoints.add(places)
+        }
+        print(waypoints)
         val jsonObjectMessage=JSONObject()
         jsonObjectMessage.put("origin", start)
         jsonObjectMessage.put("destination", end)
