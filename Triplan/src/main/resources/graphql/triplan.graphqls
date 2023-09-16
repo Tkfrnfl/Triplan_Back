@@ -8,7 +8,7 @@ schema {
 type Mutation{
     login:String
 
-    askGpt(question:String!):Question!
+    askGpt(question:String!):[String]
 
     requestPlanInformation(request: PlanRequestDto, requests: [DayPlanRequestDto]): String
 
@@ -22,5 +22,5 @@ type Query{
 }
 
 type Question{
-    question:String
+    question:[String]
 }
