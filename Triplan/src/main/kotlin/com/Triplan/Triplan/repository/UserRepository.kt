@@ -8,4 +8,5 @@ import java.util.Optional
 interface UserRepository: JpaRepository<User, Long> {
 
     fun findByRoleAndSocialId(role: Role, socialId: String?): Optional<User>
+    fun deleteUserByEmail(email: String?)
 }

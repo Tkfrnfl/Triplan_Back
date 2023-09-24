@@ -51,4 +51,31 @@ class AuthService(
             throw Exception("user is not authenticated")
         }
     }
+
+    fun findEmailByKakaoToken(accessToken: String): String {
+        try {
+            val headers = HttpHeaders()
+            headers.add("Authorization", "$accessToken")
+            headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8")
+            val rt = RestTemplate()
+            rt.requestFactory = HttpComponentsClientHttpRequestFactory()
+
+            val kakaoProfileRequest = HttpEntity<MultiValueMap<String, String>>(headers)
+
+            val response = rt.exchange(
+                "https://kapi.kakao.com/v2/user/me",
+                HttpMethod.GET,
+                kakaoProfileRequest,
+                String::class.java
+            )
+
+            val parser = JSONParser()
+            val elem = parser.parse(response.body) as JSONObject
+
+            return (elem["kakao_account"] as JSONObject)["email"] as String
+
+        } catch (exception: Exception) {
+            throw Exception("user is not authenticated")
+        }
+    }
 }

@@ -35,4 +35,11 @@ class UserService(
 
         return authService.saveUserInfoByKakaoToken(accessToken).get().socialId
     }
+
+    fun deleteAccount(accessToken: String):String {
+
+        userRepository.deleteUserByEmail(authService.findEmailByKakaoToken(accessToken))
+
+        return "ok"
+    }
 }

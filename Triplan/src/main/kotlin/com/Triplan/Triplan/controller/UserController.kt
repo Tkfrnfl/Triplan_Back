@@ -20,7 +20,7 @@ class UserController(private val userService: UserService,
     fun login(): ResponseEntity<String> {
 
         val accessToken = request.getHeader("Authorization")
-        val userId= userService.login(accessToken)
+        val userId = userService.login(accessToken)
         return ResponseEntity.ok(userId)
     }
 
@@ -31,5 +31,11 @@ class UserController(private val userService: UserService,
         val user = userService.userInfo(userService.findSocialId(accessToken))
 
         return ResponseEntity.ok(user)
+    }
+
+    @MutationMapping
+    fun deleteAccount(): ResponseEntity<String> {
+        val accessToken = request.getHeader("Authorization")
+        return ResponseEntity.ok(userService.deleteAccount(accessToken))
     }
 }
